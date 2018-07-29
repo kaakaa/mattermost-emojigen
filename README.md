@@ -2,7 +2,7 @@
 
 # Mattermost EmojiGen
 
-Mattermost plugin for generating custome emoji.
+Mattermost plugin for generating custom emoji.
 
 ![sample](./emoji_sample.png)
 
