@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/kaakaa/mattermost-emojigen.svg?token=Quh1sKztRpq9F7nwVCUC&branch=master)](https://travis-ci.com/kaakaa/mattermost-emojigen)
+[![Build Status](https://travis-ci.org/kaakaa/mattermost-emojigen.svg?branch=master)](https://travis-ci.org/kaakaa/mattermost-emojigen)
 
 # Mattermost EmojiGen
 
