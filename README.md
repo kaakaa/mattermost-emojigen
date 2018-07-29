@@ -14,10 +14,8 @@ Mattermost plugin for generating custom emoji.
 3. Set your Mattermost Personal Access Token in configuration page on admin console
 
 **Warning**:
-This plugin is developes using mattermost plugin-2 architechture. 
-Mattermost will switch plugin architecture in Mattermost v5.2 (will be released in 2018/8/16).
-
-So if now you use this plugin, you run mattermost from latest [master branch](https://github.com/mattermost/mattermost-server).
+This plugin is developed with new mattermost plugin architechture (i.e.: plugin-2). 
+Mattermost will switch plugin architecture in Mattermost v5.2 (will be released in 2018/8/16). So if now you use this plugin, you can run mattermost-emojigen as custom slash command server or run mattermost-server from latest [master branch](https://github.com/mattermost/mattermost-server).
 
 
 ### Custom Slash Command
