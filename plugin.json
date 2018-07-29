@@ -1,0 +1,20 @@
+{
+    "id": "emojigen",
+    "name": "EmojiGen",
+    "description": "Generate emoji.",
+    "version": "0.0.1",
+    "backend": {
+        "executable": "plugin"
+    },
+    "settings_schema": {
+        "settings": [
+            {
+                "key": "AccessToken",
+                "display_name": "Mattermost Access Token",
+                "type": "text",
+                "help_text": "Mattermost Personal Access Token for executing CreateEmoji API",
+                "placeholder": "379xmkr937numxy4qhswbrmtgc"
+            }
+        ]
+    }
+}
