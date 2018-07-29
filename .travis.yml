@@ -11,4 +11,13 @@ script:
 - task lint
 - task dist_all
 
-
+deploy:
+  provider: releases
+  api_key:
+    secure: n7f4NLGzTsvvt0biehgr99PsCl4bUJ/FNmT/yx+UIHPM4tz9SQb+lqDsWpptM4O76LJ4vbrbtd+MKl3j0NbavsL6ly6YyfuwCuXmJvNyMD5zPRarolL5MM8SIhihwPIGgN5tFUbogZU/trK6hpZ5eX3BchslxbX4zxzJtvdmesyTRJXVykfPb9aP7zNLaHbLDLnCwFSZqzdnewctW+7FS+JEfr0OQLcweWJO5HYILuI6/YsnUtHbcZfoUl8UGDTWgmW1Tiux93LHR74+LpFDuH4PXR9Ut4tZh3A4VZFKWKLT4YzZCc1/WLlg1G7fb/bhy8K8D2+RFmeIThGVUUcJiFwAhpgcXgF72iK3PWC+kYbEL3zndUnHD07Xg7pAqj7w1V6tbmCyeh6QKeueUpxdmmkbOp2WjECdeAyvQgTjNalJQNsFpjh/+XXUw5ni3goIh7sS8UT9+HJ43yeQSvLtxGV81np1TbrLelpJ2VUS1kuj2wt5VYKN6peaUMncIctOxdL7K7AUzawpadpNlN9kPw49GFZQimj/HkBPAtCQ0Jq4GKxXVFPx2xJ+3YnLtxUFR/ao7VGUebi88mQMC5cX4pmQcmEoGdImDhXf6qyYGy0FhKQgXQq9JnmM4VoFkMP/vLSIJDlU9ilON3M8U6EbMjf1qPBs18kKtyq23u3AEQk=
+  file_glob: true
+  file: dist/*.tar.gz
+  skip_cleanup: true
+  on:
+    repo: kaakaa/mattermost-emojigen
+    tags: true
