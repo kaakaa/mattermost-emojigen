@@ -9,7 +9,7 @@ Mattermost plugin for generating custom emoji.
 ## Set up
 
 ### Plugin
-1. Download a plugin distribution from [Releases · kaakaa/mattermost\-cron\-plugin](https://github.com/kaakaa/mattermost-emojigen/releases)
+1. Download a plugin distribution from [Releases · kaakaa/mattermost\-emojigen](https://github.com/kaakaa/mattermost-emojigen/releases)
 2. Upload and Enabling plugin from your mattermost's admin console
 3. Set your Mattermost Personal Access Token in configuration page on admin console
 
