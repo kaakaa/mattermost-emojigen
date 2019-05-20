@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"strings"
+	"sync"
 
 	"github.com/kaakaa/mattermost-emojigen/util"
 	"github.com/mattermost/mattermost-server/model"
@@ -11,14 +12,14 @@ import (
 
 type EmojigenPlugin struct {
 	plugin.MattermostPlugin
-	client      *util.MattermostClient
-	AccessToken string
+	client *util.MattermostClient
+
+	configurationLock sync.RWMutex
+	configuration     *configuration
 }
 
 func (p *EmojigenPlugin) OnActivate() error {
 	p.API.LogInfo("Activating...")
-
-	p.setMattermostClient()
 
 	if err := p.API.RegisterCommand(&model.Command{
 		Trigger:          "emojigen",
@@ -55,21 +56,46 @@ func (p *EmojigenPlugin) ExecuteCommand(c *plugin.Context, args *model.CommandAr
 }
 
 func (p *EmojigenPlugin) OnConfigurationChange() error {
-	if err := p.MattermostPlugin.OnConfigurationChange(); err != nil {
-		p.API.LogError(err.Error())
-		return err
+	var configuration = new(configuration)
+
+	if err := p.API.LoadPluginConfiguration(configuration); err != nil {
+		return fmt.Errorf("failed to load plugin configuration: %v", err)
 	}
 
-	p.setMattermostClient()
+	p.setConfiguration(configuration)
+	return p.setMattermostClient()
+}
+
+func (p *EmojigenPlugin) setMattermostClient() error {
+	if p.configuration == nil || p.configuration.AccessToken == "" {
+		return fmt.Errorf("failed to load plugin configuration")
+	}
+	config := p.API.GetConfig()
+	p.client = util.Login(*config.ServiceSettings.SiteURL, p.configuration.AccessToken)
+	p.API.LogInfo(fmt.Sprintf("Update client successfuly"))
+	p.API.LogInfo(fmt.Sprintf("SiteURL: %v", *config.ServiceSettings.SiteURL))
+	p.API.LogInfo(fmt.Sprintf("AccessToken: %v", p.configuration.AccessToken))
 	return nil
 }
 
-func (p *EmojigenPlugin) setMattermostClient() {
-	config := p.API.GetConfig()
-	p.client = util.Login(*config.ServiceSettings.SiteURL, p.AccessToken)
-	p.API.LogInfo(fmt.Sprintf("Update client successfuly"))
-	p.API.LogInfo(fmt.Sprintf("SiteURL: %v", *config.ServiceSettings.SiteURL))
-	p.API.LogInfo(fmt.Sprintf("AccessToken: %v", p.AccessToken))
+type configuration struct {
+	AccessToken string
+}
+
+func (p *EmojigenPlugin) getCOnfiguration() *configuration {
+	p.configurationLock.RLock()
+	defer p.configurationLock.RUnlock()
+
+	if p.configuration == nil {
+		return &configuration{}
+	}
+	return p.configuration
+}
+
+func (p *EmojigenPlugin) setConfiguration(configuration *configuration) {
+	p.configurationLock.Lock()
+	defer p.configurationLock.Unlock()
+	p.configuration = configuration
 }
 
 func main() {
