@@ -5,9 +5,12 @@ language: go
 go:
 - '1.12.x'
 
+before_script:
+  - go mod tidy
 script:
   - make check-style
   - make test
+
 before_deploy:
   - make dist
 
