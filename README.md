@@ -13,29 +13,6 @@ Mattermost plugin for generating custom emoji.
 2. Upload and Enabling plugin from your mattermost's admin console
 3. Set your Mattermost Personal Access Token in configuration page on admin console
 
-**Warning**:
-This plugin is developed with new mattermost plugin architechture (i.e.: plugin-2). 
-Mattermost will switch plugin architecture in Mattermost v5.2 (will be released in 2018/8/16). So if now you use this plugin, you can run mattermost-emojigen as custom slash command server or run mattermost-server from latest [master branch](https://github.com/mattermost/mattermost-server).
-
-
-### Custom Slash Command
-1. Clone this repository `git clone https://github.com/kaakaa/mattermost-emojigen`
-2. Install dependencies `dep ensure` (Need [golang/dep](https://github.com/golang/dep))
-3. Write config.json (ExampleFile: `.config.json`)
-  * **listen**: Mattermost emojigen server
-  * **mattermost_url**: Mattermost server URL
-  * **access_token**: [Mattermost Personal Access Token](https://docs.mattermost.com/developer/personal-access-tokens.html) for creating emoji
-4. Run `go run cmd/emojigen/slash.main.go`
-5. Create custom slash command
-  * **DisplayName**: emojigen
-  * **Description**: Creating emoji by https://github.com/kaakaa/mattermost-emojigen
-  * **Command Trigger Word**: emojigen
-  * **Request URL**: http://localhost:8505/emoji
-  * **Request Method**: POST
-  * **Autocomplete**: Checked
-  * **Autocomplete Hint**: [EMOJI_NAME] [TEXT]
-  * **Autocomplete Description**: Creating Emoji
-
 ## Usage
 
 1. Executing `emojigen` command
@@ -48,18 +25,10 @@ Mattermost will switch plugin architecture in Mattermost v5.2 (will be released 
 
 ## Development
 
-### Prerequires
-
-Since `mattermost-emojigen` uses [go\-task/task](https://github.com/go-task/task) for effective development, you are better to install it.
-
-```
-go get -u github.com/go-task/task/cmd/task
-```
-
 ### Building
 
 ```
-task dist
+make dist
 ```
 
 # License
