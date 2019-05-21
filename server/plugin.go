@@ -5,14 +5,13 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/kaakaa/mattermost-emojigen/util"
 	"github.com/mattermost/mattermost-server/model"
 	"github.com/mattermost/mattermost-server/plugin"
 )
 
 type EmojigenPlugin struct {
 	plugin.MattermostPlugin
-	client *util.MattermostClient
+	client *MattermostClient
 
 	configurationLock sync.RWMutex
 	configuration     *configuration
@@ -71,33 +70,9 @@ func (p *EmojigenPlugin) setMattermostClient() error {
 		return fmt.Errorf("failed to load plugin configuration")
 	}
 	config := p.API.GetConfig()
-	p.client = util.Login(*config.ServiceSettings.SiteURL, p.configuration.AccessToken)
+	p.client = Login(*config.ServiceSettings.SiteURL, p.configuration.AccessToken)
 	p.API.LogInfo(fmt.Sprintf("Update client successfuly"))
 	p.API.LogInfo(fmt.Sprintf("SiteURL: %v", *config.ServiceSettings.SiteURL))
 	p.API.LogInfo(fmt.Sprintf("AccessToken: %v", p.configuration.AccessToken))
 	return nil
-}
-
-type configuration struct {
-	AccessToken string
-}
-
-func (p *EmojigenPlugin) getCOnfiguration() *configuration {
-	p.configurationLock.RLock()
-	defer p.configurationLock.RUnlock()
-
-	if p.configuration == nil {
-		return &configuration{}
-	}
-	return p.configuration
-}
-
-func (p *EmojigenPlugin) setConfiguration(configuration *configuration) {
-	p.configurationLock.Lock()
-	defer p.configurationLock.Unlock()
-	p.configuration = configuration
-}
-
-func main() {
-	plugin.ClientMain(&EmojigenPlugin{})
 }
