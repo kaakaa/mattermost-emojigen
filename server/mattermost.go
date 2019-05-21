@@ -25,9 +25,9 @@ func Login(url, token string) *MattermostClient {
 func (c *MattermostClient) RegistNewEmoji(name, msg, userId string) error {
 	_, resp := c.client.GetUser(userId, "")
 	if len(userId) == 0 || resp.StatusCode != 200 {
-		u, resp := c.client.GetMe("")
-		if resp.StatusCode != 200 {
-			return fmt.Errorf(resp.Error.Message)
+		u, ret := c.client.GetMe("")
+		if ret.StatusCode != 200 {
+			return fmt.Errorf(ret.Error.Message)
 		}
 		userId = u.Id
 	}
