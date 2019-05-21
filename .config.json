@@ -1,5 +1,0 @@
-{
-    "listen": "localhost:8505",
-    "mattermost_url": "http://example.com:8065",
-    "access_token": "MATTERMOST_ACCESS_TOKEN"
-}

@@ -1,15 +1,20 @@
+notifications:
+  email: false
 sudo: false
 language: go
 go:
-- '1.10'
-- tip
-install:
-- go get github.com/go-task/task/cmd/task
+- '1.12.x'
+env:
+  - GO111MODULE=on
+
+  before_script:
+  - go mod tidy
 script:
-- task dl-deps
-- task update-deps
-- task lint
-- task dist_all
+  - make check-style
+  - make test
+
+before_deploy:
+  - make dist
 
 deploy:
   provider: releases
