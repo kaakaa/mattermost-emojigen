@@ -21,8 +21,6 @@ Mattermost plugin for generating custom emoji.
 ```
 2. Use emoji (e.g.: `:yabasugi:`)
 
-(For Japanese) 平仮名は絵文字にできますが漢字はほんの一部のみ画像化できるようです（カタカナはダメ）。https://github.com/pbnjay/pixfont で漢字なども画像化できる方法があれば可能になるかもしれません。
-
 ## Development
 
 ### Building
@@ -33,5 +31,5 @@ make dist
 
 # License
 
-* MIT
-  * see [LICENSE](LICENSE)
+* This plugin is distributed under [MIT LICENSE](LICENSE)
+* This plugin uses [**M+ Fonts**](https://mplus-fonts.osdn.jp/) for generating emojis. **M+ Fonts** is distributed under [LICENSE](./assets/ttf/mplus/LICENSE_E).
