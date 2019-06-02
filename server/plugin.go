@@ -96,7 +96,6 @@ func (p *EmojigenPlugin) setMattermostClient() error {
 	}
 	config := p.API.GetConfig()
 	p.client = Login(*config.ServiceSettings.SiteURL, p.configuration.AccessToken)
-	p.API.LogInfo("Update client successfuly")
 	p.API.LogInfo(fmt.Sprintf("SiteURL: %v", *config.ServiceSettings.SiteURL))
 	p.API.LogInfo(fmt.Sprintf("AccessToken: %v", p.configuration.AccessToken))
 
