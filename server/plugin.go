@@ -5,6 +5,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/kaakaa/mattermost-emojigen/server/font"
 	"github.com/mattermost/mattermost-server/model"
 	"github.com/mattermost/mattermost-server/plugin"
 )
@@ -15,10 +16,24 @@ type EmojigenPlugin struct {
 
 	configurationLock sync.RWMutex
 	configuration     *configuration
+
+	drawer *font.EmojiDrawer
 }
 
 func (p *EmojigenPlugin) OnActivate() error {
 	p.API.LogInfo("Activating...")
+
+	path, err := p.API.GetBundlePath()
+	if err != nil {
+		p.API.LogError("Failed to get bundle path")
+		return err
+	}
+	drawer, err := font.NewEmojiDrawer(path)
+	if err != nil {
+		p.API.LogError("Failed to init EmojiDrawer", "details", err)
+		return err
+	}
+	p.drawer = drawer
 
 	if err := p.API.RegisterCommand(&model.Command{
 		Trigger:          "emojigen",
@@ -41,7 +56,17 @@ func (p *EmojigenPlugin) ExecuteCommand(c *plugin.Context, args *model.CommandAr
 	p.API.LogDebug(fmt.Sprintf("message: %v", emojiText))
 	p.API.LogDebug(fmt.Sprintf("user_id: %v", userId))
 
-	if err := p.client.RegistNewEmoji(emojiName, emojiText, userId); err != nil {
+	b, err := p.drawer.GenerateEmoji(emojiText)
+
+	p.API.LogDebug(fmt.Sprintf("TEST: %v", len(b)))
+	if err != nil {
+		return &model.CommandResponse{
+			ResponseType: model.COMMAND_RESPONSE_TYPE_EPHEMERAL,
+			Text:         fmt.Sprintf("Encountered error when generating emoji image: %v", err.Error()),
+		}, nil
+	}
+
+	if err := p.client.RegistNewEmoji(b, emojiName, userId); err != nil {
 		p.API.LogError(err.Error())
 		return &model.CommandResponse{
 			ResponseType: model.COMMAND_RESPONSE_TYPE_EPHEMERAL,
@@ -71,8 +96,9 @@ func (p *EmojigenPlugin) setMattermostClient() error {
 	}
 	config := p.API.GetConfig()
 	p.client = Login(*config.ServiceSettings.SiteURL, p.configuration.AccessToken)
-	p.API.LogInfo(fmt.Sprintf("Update client successfuly"))
+	p.API.LogInfo("Update client successfuly")
 	p.API.LogInfo(fmt.Sprintf("SiteURL: %v", *config.ServiceSettings.SiteURL))
 	p.API.LogInfo(fmt.Sprintf("AccessToken: %v", p.configuration.AccessToken))
+
 	return nil
 }

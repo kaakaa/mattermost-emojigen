@@ -21,6 +21,7 @@
                 "help_text": "Mattermost Personal Access Token for executing CreateEmoji API",
                 "placeholder": "379xmkr937numxy4qhswbrmtgc"
             }
-        ]
+        ],
+        "footer": "* To report an issue, make a suggestion or a contribution, [check the repository](https://github.com/kaakaa/mattermost-emojigen).\n* * *\nThis plugin uses [**M+ Fonts**](https://mplus-fonts.osdn.jp/) for generating emojis, and **M+ Fonts** is [distributed under unlimited permission](https://mplus-fonts.osdn.jp/about-en.html#license)."
     }
 }
