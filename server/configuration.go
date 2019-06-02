@@ -4,7 +4,7 @@ type configuration struct {
 	AccessToken string
 }
 
-func (p *EmojigenPlugin) getCOnfiguration() *configuration {
+func (p *EmojigenPlugin) getConfiguration() *configuration {
 	p.configurationLock.RLock()
 	defer p.configurationLock.RUnlock()
 
