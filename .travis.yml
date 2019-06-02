@@ -4,17 +4,13 @@ sudo: false
 language: go
 go:
 - '1.12.x'
-env:
-  - GO111MODULE=on
 
-  before_script:
-  - go mod tidy
 script:
-  - make check-style
-  - make test
+  - GO111MODULE=on make check-style
+  - GO111MODULE=on make test
 
 before_deploy:
-  - make dist
+  - env GO111MODULE=on make dist
 
 deploy:
   provider: releases
