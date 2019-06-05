@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"strings"
 	"sync"
 
 	"github.com/kaakaa/mattermost-emojigen/server/font"
@@ -39,7 +38,7 @@ func (p *EmojigenPlugin) OnActivate() error {
 		Trigger:          "emojigen",
 		AutoComplete:     true,
 		AutoCompleteDesc: `Generate emoji`,
-		AutoCompleteHint: `[EMOJI_NAME] [TEXT]`,
+		AutoCompleteHint: `[EMOJI_NAME] [TEXT] [Black|Red|Blue|Green|White] [Black|Red|Blue|Green|White]`,
 	}); err != nil {
 		p.API.LogError(err.Error())
 		return err
@@ -48,17 +47,21 @@ func (p *EmojigenPlugin) OnActivate() error {
 }
 
 func (p *EmojigenPlugin) ExecuteCommand(c *plugin.Context, args *model.CommandArgs) (*model.CommandResponse, *model.AppError) {
-	text := strings.Split(args.Command, " ")
-	emojiName := text[1]
-	emojiText := text[2]
+	emoji, err := font.NewEmojiInfoFromLine(args.Command)
+	if err != nil {
+		return &model.CommandResponse{
+			ResponseType: model.COMMAND_RESPONSE_TYPE_EPHEMERAL,
+			Text:         fmt.Sprintf("Encountered error when parsing command: %v", err.Error()),
+		}, nil
+	}
+
 	userId := args.UserId
-	p.API.LogDebug(fmt.Sprintf("emoji_name: %v", emojiName))
-	p.API.LogDebug(fmt.Sprintf("message: %v", emojiText))
+
+	p.API.LogDebug(fmt.Sprintf("emoji: %#v", emoji))
 	p.API.LogDebug(fmt.Sprintf("user_id: %v", userId))
 
-	b, err := p.drawer.GenerateEmoji(emojiText)
+	b, err := p.drawer.GenerateEmoji(emoji)
 
-	p.API.LogDebug(fmt.Sprintf("TEST: %v", len(b)))
 	if err != nil {
 		return &model.CommandResponse{
 			ResponseType: model.COMMAND_RESPONSE_TYPE_EPHEMERAL,
@@ -66,7 +69,7 @@ func (p *EmojigenPlugin) ExecuteCommand(c *plugin.Context, args *model.CommandAr
 		}, nil
 	}
 
-	if err := p.client.RegistNewEmoji(b, emojiName, userId); err != nil {
+	if err := p.client.RegistNewEmoji(b, emoji.Name, userId); err != nil {
 		p.API.LogError(err.Error())
 		return &model.CommandResponse{
 			ResponseType: model.COMMAND_RESPONSE_TYPE_EPHEMERAL,
@@ -75,7 +78,7 @@ func (p *EmojigenPlugin) ExecuteCommand(c *plugin.Context, args *model.CommandAr
 	}
 	return &model.CommandResponse{
 		ResponseType: model.COMMAND_RESPONSE_TYPE_EPHEMERAL,
-		Text:         fmt.Sprintf("Creating emoji with `:%s:` is success. :%s:", emojiName, emojiName),
+		Text:         fmt.Sprintf("Creating emoji with `:%s:` is success. :%s:", emoji.Name, emoji.Name),
 	}, nil
 }
 
