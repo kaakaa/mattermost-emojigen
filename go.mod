@@ -5,6 +5,7 @@ go 1.12
 require (
 	github.com/go-ldap/ldap v3.0.3+incompatible // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0
+	github.com/gorilla/mux v1.7.0
 	github.com/hashicorp/go-hclog v0.9.2 // indirect
 	github.com/mattermost/go-i18n v1.10.0 // indirect
 	github.com/mattermost/mattermost-server v0.0.0-20190519073129-18612bf771d5
