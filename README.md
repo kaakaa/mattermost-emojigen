@@ -15,11 +15,26 @@ Mattermost plugin for generating custom emoji.
 
 ## Usage
 
+### Simple Emoji
 1. Executing `emojigen` command
 ```
 /emojigen yabasugi やばすぎ
 ```
 2. Use emoji (e.g.: `:yabasugi:`)
+
+### Color Emoji
+You can specify font-color and background-color of emoji. Available colors are Black, Red, Green, Blue, White.
+
+```
+/emojigen yabasugi やばすぎ Red Blue
+```
+
+### Emoji dialog
+```
+/emojigen
+```
+
+![Emoji Dialog](./emoji_dialog.png)
 
 ## Development
 

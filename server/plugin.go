@@ -5,6 +5,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/gorilla/mux"
 	"github.com/kaakaa/mattermost-emojigen/server/font"
 	"github.com/mattermost/mattermost-server/model"
 	"github.com/mattermost/mattermost-server/plugin"
@@ -16,6 +17,9 @@ type EmojigenPlugin struct {
 
 	configurationLock sync.RWMutex
 	configuration     *configuration
+
+	siteURL string
+	router  *mux.Router
 
 	drawer *font.EmojiDrawer
 }
@@ -39,26 +43,39 @@ func (p *EmojigenPlugin) OnActivate() error {
 		Trigger:          "emojigen",
 		AutoComplete:     true,
 		AutoCompleteDesc: `Generate emoji`,
-		AutoCompleteHint: `[EMOJI_NAME] [TEXT]`,
+		AutoCompleteHint: `[EMOJI_NAME] [TEXT] [Black|Red|Blue|Green|White] [Black|Red|Blue|Green|White]`,
 	}); err != nil {
 		p.API.LogError(err.Error())
 		return err
 	}
+
+	p.router = p.InitAPI()
 	return nil
 }
 
 func (p *EmojigenPlugin) ExecuteCommand(c *plugin.Context, args *model.CommandArgs) (*model.CommandResponse, *model.AppError) {
-	text := strings.Split(args.Command, " ")
-	emojiName := text[1]
-	emojiText := text[2]
+	if len(strings.Split(strings.TrimSpace(args.Command), " ")) == 1 {
+		if appErr := p.API.OpenInteractiveDialog(p.getEmojiDialog(args.TriggerId)); appErr != nil {
+			return nil, appErr
+		}
+		return &model.CommandResponse{}, nil
+	}
+
+	emoji, err := font.NewEmojiInfoFromLine(args.Command)
+	if err != nil {
+		return &model.CommandResponse{
+			ResponseType: model.COMMAND_RESPONSE_TYPE_EPHEMERAL,
+			Text:         fmt.Sprintf("Encountered error when parsing command: %v", err.Error()),
+		}, nil
+	}
+
 	userId := args.UserId
-	p.API.LogDebug(fmt.Sprintf("emoji_name: %v", emojiName))
-	p.API.LogDebug(fmt.Sprintf("message: %v", emojiText))
+
+	p.API.LogDebug(fmt.Sprintf("emoji: %#v", emoji))
 	p.API.LogDebug(fmt.Sprintf("user_id: %v", userId))
 
-	b, err := p.drawer.GenerateEmoji(emojiText)
+	b, err := p.drawer.GenerateEmoji(emoji)
 
-	p.API.LogDebug(fmt.Sprintf("TEST: %v", len(b)))
 	if err != nil {
 		return &model.CommandResponse{
 			ResponseType: model.COMMAND_RESPONSE_TYPE_EPHEMERAL,
@@ -66,7 +83,7 @@ func (p *EmojigenPlugin) ExecuteCommand(c *plugin.Context, args *model.CommandAr
 		}, nil
 	}
 
-	if err := p.client.RegistNewEmoji(b, emojiName, userId); err != nil {
+	if err := p.client.RegistNewEmoji(b, emoji.Name, userId); err != nil {
 		p.API.LogError(err.Error())
 		return &model.CommandResponse{
 			ResponseType: model.COMMAND_RESPONSE_TYPE_EPHEMERAL,
@@ -75,7 +92,7 @@ func (p *EmojigenPlugin) ExecuteCommand(c *plugin.Context, args *model.CommandAr
 	}
 	return &model.CommandResponse{
 		ResponseType: model.COMMAND_RESPONSE_TYPE_EPHEMERAL,
-		Text:         fmt.Sprintf("Creating emoji with `:%s:` is success. :%s:", emojiName, emojiName),
+		Text:         fmt.Sprintf("Creating emoji with `:%s:` is success. :%s:", emoji.Name, emoji.Name),
 	}, nil
 }
 
@@ -95,9 +112,63 @@ func (p *EmojigenPlugin) setMattermostClient() error {
 		return fmt.Errorf("failed to load plugin configuration")
 	}
 	config := p.API.GetConfig()
-	p.client = Login(*config.ServiceSettings.SiteURL, p.configuration.AccessToken)
+	p.siteURL = *config.ServiceSettings.SiteURL
+	p.client = Login(p.siteURL, p.configuration.AccessToken)
 	p.API.LogInfo(fmt.Sprintf("SiteURL: %v", *config.ServiceSettings.SiteURL))
 	p.API.LogInfo(fmt.Sprintf("AccessToken: %v", p.configuration.AccessToken))
 
 	return nil
+}
+
+func (p *EmojigenPlugin) getEmojiDialog(triggerId string) model.OpenDialogRequest {
+	return model.OpenDialogRequest{
+		TriggerId: triggerId,
+		URL:       fmt.Sprintf("%s/plugins/%s/%s", p.siteURL, manifest.Id, "dialog/open"),
+		Dialog: model.Dialog{
+			Title: "Generate Emoji",
+			Elements: []model.DialogElement{
+				{
+					DisplayName: "Emoji Name (e.g.: +1)",
+					Name:        "emoji_name",
+					Type:        "text",
+					MinLength:   1,
+					Placeholder: "+1, smiley,...",
+				},
+				{
+					DisplayName: "Emoji Text",
+					Name:        "emoji_text",
+					Type:        "textarea",
+					MinLength:   1,
+					MaxLength:   4,
+				},
+				{
+					DisplayName: "Font Color",
+					Name:        "emoji_font_color",
+					Type:        "select",
+					Default:     "Black",
+					Options: []*model.PostActionOptions{
+						{Text: "Black", Value: "Black"},
+						{Text: "Red", Value: "Red"},
+						{Text: "Green", Value: "Green"},
+						{Text: "Blue", Value: "Blue"},
+						{Text: "White", Value: "White"},
+					},
+				},
+				{
+					DisplayName: "Background Color",
+					Name:        "emoji_background_color",
+					Type:        "select",
+					Default:     "White",
+					Options: []*model.PostActionOptions{
+						{Text: "Black", Value: "Black"},
+						{Text: "Red", Value: "Red"},
+						{Text: "Green", Value: "Green"},
+						{Text: "Blue", Value: "Blue"},
+						{Text: "White", Value: "White"},
+					},
+				},
+			},
+			SubmitLabel: "Create",
+		},
+	}
 }

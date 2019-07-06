@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"image"
-	"image/color"
 	"image/draw"
 	"image/png"
 	"io/ioutil"
@@ -50,32 +49,34 @@ func NewEmojiDrawer(bundlePath string) (*EmojiDrawer, error) {
 
 	return &EmojiDrawer{
 		baseDrawer: font.Drawer{
-			Src:  image.Black,
+			Src:  image.White,
 			Face: face,
 			Dot:  fixed.Point26_6{},
 		},
 	}, nil
 }
 
-func (e *EmojiDrawer) GenerateEmoji(text string) ([]byte, error) {
+func (e *EmojiDrawer) GenerateEmoji(emoji *EmojiInfo) ([]byte, error) {
 	// TODO: must prevent to run concurrently
-	switch utf8.RuneCountInString(text) {
+	switch utf8.RuneCountInString(emoji.Text) {
 	case 1, 2:
-		return e.generateOneLineEmoji(text)
+		return e.generateOneLineEmoji(emoji)
 	case 3, 4:
-		return e.generateTwoLinesEmoji(text)
+		return e.generateTwoLinesEmoji(emoji)
 	default:
-		return nil, fmt.Errorf("Emojigen can generate 1~4 characters. You specified %d characters.", utf8.RuneCountInString(text))
+		return nil, fmt.Errorf("Emojigen can generate 1~4 characters. You specified %d characters.", utf8.RuneCountInString(emoji.Text))
 	}
 }
 
-func (e *EmojiDrawer) generateOneLineEmoji(text string) ([]byte, error) {
+func (e *EmojiDrawer) generateOneLineEmoji(emoji *EmojiInfo) ([]byte, error) {
 	// Generate new Image
-	e.baseDrawer.Dst = getNewImage()
+	e.baseDrawer.Dst = getNewImage(emoji.BackgroundColor.RGBA())
 	// To wide for fitting margin
-	text = width.Widen.String(text)
+	text := width.Widen.String(emoji.Text)
 
 	drawer := e.baseDrawer
+	drawer.Src = emoji.FontColor.RGBA()
+
 	drawer.Dot.X = (fixed.I(Width) - (&drawer).MeasureString(text)) / 2
 	drawer.Dot.Y = fixed.I((fontSize * 2 / 5) + (Height / 2))
 
@@ -87,12 +88,12 @@ func (e *EmojiDrawer) generateOneLineEmoji(text string) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func (e *EmojiDrawer) generateTwoLinesEmoji(text string) ([]byte, error) {
+func (e *EmojiDrawer) generateTwoLinesEmoji(emoji *EmojiInfo) ([]byte, error) {
 	// Generate new Image
-	e.baseDrawer.Dst = getNewImage()
+	e.baseDrawer.Dst = getNewImage(emoji.BackgroundColor.RGBA())
 
 	// To wide for fitting margin
-	r := []rune(text)
+	r := []rune(emoji.Text)
 	t1 := width.Widen.String(string(r[0:2]))
 	t2 := width.Widen.String(string(r[2:]))
 	if utf8.RuneCountInString(t2) == 1 {
@@ -101,6 +102,8 @@ func (e *EmojiDrawer) generateTwoLinesEmoji(text string) ([]byte, error) {
 
 	// Calcurating positions X/Y is curious...
 	drawer := e.baseDrawer
+	drawer.Src = emoji.FontColor.RGBA()
+
 	drawer.Dot.X = (fixed.I(Width) - (&drawer).MeasureString(t1)) / 2
 	drawer.Dot.Y = fixed.I(fontSize - fontSize/8)
 	drawer.DrawString(t1)
@@ -116,11 +119,11 @@ func (e *EmojiDrawer) generateTwoLinesEmoji(text string) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func getNewImage() draw.Image {
+func getNewImage(color *image.Uniform) draw.Image {
 	img := image.NewRGBA(image.Rect(0, 0, Width, Height))
 	for h := 0; h < Height; h++ {
 		for w := 0; w < Width; w++ {
-			img.Set(w, h, color.White)
+			img.Set(w, h, color)
 		}
 	}
 	return img
