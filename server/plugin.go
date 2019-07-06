@@ -123,7 +123,7 @@ func (p *EmojigenPlugin) setMattermostClient() error {
 func (p *EmojigenPlugin) getEmojiDialog(triggerId string) model.OpenDialogRequest {
 	return model.OpenDialogRequest{
 		TriggerId: triggerId,
-		URL:       fmt.Sprintf("%s/plugins/%s/%s", p.siteURL, manifest.Id, "dialog/open"),
+		URL:       fmt.Sprintf("%s/plugins/%s/%s", p.siteURL, manifest.ID, "dialog/open"),
 		Dialog: model.Dialog{
 			Title: "Generate Emoji",
 			Elements: []model.DialogElement{
