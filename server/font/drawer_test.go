@@ -1,9 +1,6 @@
 package font
 
 import (
-	"fmt"
-	"io/ioutil"
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -81,7 +78,7 @@ func TestGenerateTwoLinesEmoji(t *testing.T) {
 				assert.Nil(err)
 				assert.Equal(test.byteLength, len(b))
 				// for debug
-				ioutil.WriteFile(fmt.Sprintf("./testTwo_%s.png", name), b, os.ModePerm)
+				// ioutil.WriteFile(fmt.Sprintf("./testTwo_%s.png", name), b, os.ModePerm)
 			}
 		})
 	}
