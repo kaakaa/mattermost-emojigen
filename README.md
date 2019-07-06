@@ -1,5 +1,6 @@
 [![CircleCI](https://circleci.com/gh/kaakaa/mattermost-emojigen/tree/master.svg?style=svg)](https://circleci.com/gh/kaakaa/mattermost-emojigen/tree/master)
 
+
 # Mattermost EmojiGen
 
 Mattermost plugin for generating custom emoji.
