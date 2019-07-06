@@ -11,6 +11,7 @@ import (
 	"github.com/mattermost/mattermost-server/plugin"
 )
 
+// EmojigenPlugin is the struct for mattermost-emojigen plugin
 type EmojigenPlugin struct {
 	plugin.MattermostPlugin
 	client *MattermostClient
@@ -24,6 +25,7 @@ type EmojigenPlugin struct {
 	drawer *font.EmojiDrawer
 }
 
+// OnActivate activate mattermost-emojigen plugin
 func (p *EmojigenPlugin) OnActivate() error {
 	p.API.LogInfo("Activating...")
 
@@ -53,6 +55,7 @@ func (p *EmojigenPlugin) OnActivate() error {
 	return nil
 }
 
+// ExecuteCommand handle commands that are created by this plugin
 func (p *EmojigenPlugin) ExecuteCommand(c *plugin.Context, args *model.CommandArgs) (*model.CommandResponse, *model.AppError) {
 	if len(strings.Split(strings.TrimSpace(args.Command), " ")) == 1 {
 		if appErr := p.API.OpenInteractiveDialog(p.getEmojiDialog(args.TriggerId)); appErr != nil {
@@ -69,10 +72,10 @@ func (p *EmojigenPlugin) ExecuteCommand(c *plugin.Context, args *model.CommandAr
 		}, nil
 	}
 
-	userId := args.UserId
+	userID := args.UserId
 
 	p.API.LogDebug(fmt.Sprintf("emoji: %#v", emoji))
-	p.API.LogDebug(fmt.Sprintf("user_id: %v", userId))
+	p.API.LogDebug(fmt.Sprintf("user_id: %v", userID))
 
 	b, err := p.drawer.GenerateEmoji(emoji)
 
@@ -83,7 +86,7 @@ func (p *EmojigenPlugin) ExecuteCommand(c *plugin.Context, args *model.CommandAr
 		}, nil
 	}
 
-	if err := p.client.RegistNewEmoji(b, emoji.Name, userId); err != nil {
+	if err := p.client.RegistNewEmoji(b, emoji.Name, userID); err != nil {
 		p.API.LogError(err.Error())
 		return &model.CommandResponse{
 			ResponseType: model.COMMAND_RESPONSE_TYPE_EPHEMERAL,
@@ -96,6 +99,7 @@ func (p *EmojigenPlugin) ExecuteCommand(c *plugin.Context, args *model.CommandAr
 	}, nil
 }
 
+// OnConfigurationChange handle changes of configuration
 func (p *EmojigenPlugin) OnConfigurationChange() error {
 	var configuration = new(configuration)
 
@@ -120,9 +124,9 @@ func (p *EmojigenPlugin) setMattermostClient() error {
 	return nil
 }
 
-func (p *EmojigenPlugin) getEmojiDialog(triggerId string) model.OpenDialogRequest {
+func (p *EmojigenPlugin) getEmojiDialog(triggerID string) model.OpenDialogRequest {
 	return model.OpenDialogRequest{
-		TriggerId: triggerId,
+		TriggerId: triggerID,
 		URL:       fmt.Sprintf("%s/plugins/%s/%s", p.siteURL, manifest.ID, "dialog/open"),
 		Dialog: model.Dialog{
 			Title: "Generate Emoji",

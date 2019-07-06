@@ -17,15 +17,17 @@ import (
 )
 
 const (
-	fontSize = 64
-	Width    = 128
-	Height   = 128
+	fontSize    = 64
+	imageWidth  = 128
+	imageHeight = 128
 )
 
+// EmojiDrawer is the struct for drawing emoji
 type EmojiDrawer struct {
 	baseDrawer font.Drawer
 }
 
+// NewEmojiDrawer returns initialized EmojiDrawer
 func NewEmojiDrawer(bundlePath string) (*EmojiDrawer, error) {
 	path := filepath.Join(bundlePath, "assets", "ttf", "mplus", "mplus-2p-black.ttf")
 	b, err := ioutil.ReadFile(path)
@@ -56,6 +58,7 @@ func NewEmojiDrawer(bundlePath string) (*EmojiDrawer, error) {
 	}, nil
 }
 
+// GenerateEmoji generate the image of moji and returns it as []byte format
 func (e *EmojiDrawer) GenerateEmoji(emoji *EmojiInfo) ([]byte, error) {
 	// TODO: must prevent to run concurrently
 	switch utf8.RuneCountInString(emoji.Text) {
@@ -64,7 +67,7 @@ func (e *EmojiDrawer) GenerateEmoji(emoji *EmojiInfo) ([]byte, error) {
 	case 3, 4:
 		return e.generateTwoLinesEmoji(emoji)
 	default:
-		return nil, fmt.Errorf("Emojigen can generate 1~4 characters. You specified %d characters.", utf8.RuneCountInString(emoji.Text))
+		return nil, fmt.Errorf("emojigen can generate 1~4 characters. You specified %d characters", utf8.RuneCountInString(emoji.Text))
 	}
 }
 
@@ -77,8 +80,8 @@ func (e *EmojiDrawer) generateOneLineEmoji(emoji *EmojiInfo) ([]byte, error) {
 	drawer := e.baseDrawer
 	drawer.Src = emoji.FontColor.RGBA()
 
-	drawer.Dot.X = (fixed.I(Width) - (&drawer).MeasureString(text)) / 2
-	drawer.Dot.Y = fixed.I((fontSize * 2 / 5) + (Height / 2))
+	drawer.Dot.X = (fixed.I(imageWidth) - (&drawer).MeasureString(text)) / 2
+	drawer.Dot.Y = fixed.I((fontSize * 2 / 5) + (imageHeight / 2))
 
 	drawer.DrawString(text)
 	buf := &bytes.Buffer{}
@@ -104,12 +107,12 @@ func (e *EmojiDrawer) generateTwoLinesEmoji(emoji *EmojiInfo) ([]byte, error) {
 	drawer := e.baseDrawer
 	drawer.Src = emoji.FontColor.RGBA()
 
-	drawer.Dot.X = (fixed.I(Width) - (&drawer).MeasureString(t1)) / 2
+	drawer.Dot.X = (fixed.I(imageWidth) - (&drawer).MeasureString(t1)) / 2
 	drawer.Dot.Y = fixed.I(fontSize - fontSize/8)
 	drawer.DrawString(t1)
 
-	drawer.Dot.X = (fixed.I(Width) - (&drawer).MeasureString(t2)) / 2
-	drawer.Dot.Y = fixed.I(Height - fontSize/8)
+	drawer.Dot.X = (fixed.I(imageWidth) - (&drawer).MeasureString(t2)) / 2
+	drawer.Dot.Y = fixed.I(imageHeight - fontSize/8)
 	drawer.DrawString(t2)
 
 	buf := &bytes.Buffer{}
@@ -120,9 +123,9 @@ func (e *EmojiDrawer) generateTwoLinesEmoji(emoji *EmojiInfo) ([]byte, error) {
 }
 
 func getNewImage(color *image.Uniform) draw.Image {
-	img := image.NewRGBA(image.Rect(0, 0, Width, Height))
-	for h := 0; h < Height; h++ {
-		for w := 0; w < Width; w++ {
+	img := image.NewRGBA(image.Rect(0, 0, imageWidth, imageHeight))
+	for h := 0; h < imageHeight; h++ {
+		for w := 0; w < imageWidth; w++ {
 			img.Set(w, h, color)
 		}
 	}
