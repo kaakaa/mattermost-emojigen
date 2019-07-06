@@ -67,7 +67,7 @@ func TestGenerateTwoLinesEmoji(t *testing.T) {
 		"Symbols_4":     {sut: drawer, emoji: &EmojiInfo{Name: "name", Text: "[~/]", FontColor: Black, BackgroundColor: White}, shouldError: false, byteLength: 1696},
 		"Color_1":       {sut: drawer, emoji: &EmojiInfo{Name: "name", Text: "字赤背白", FontColor: Red, BackgroundColor: White}, shouldError: false, byteLength: 3475},
 		"Color_2":       {sut: drawer, emoji: &EmojiInfo{Name: "name", Text: "字黒背青", FontColor: Black, BackgroundColor: Blue}, shouldError: false, byteLength: 2905},
-		"Color_3":       {sut: drawer, emoji: &EmojiInfo{Name: "name", Text: "字緑背黒", FontColor: Green, BackgroundColor: Black}, shouldError: false, byteLength: 5405},
+		"Color_3":       {sut: drawer, emoji: &EmojiInfo{Name: "name", Text: "字緑背黒", FontColor: Green, BackgroundColor: Black}, shouldError: false, byteLength: 3805},
 	} {
 		t.Run(name, func(t *testing.T) {
 			assert := assert.New(t)
