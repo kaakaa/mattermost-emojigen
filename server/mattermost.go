@@ -8,10 +8,12 @@ import (
 	"github.com/mattermost/mattermost-server/model"
 )
 
+// MattermostClient is the client that sends requests to Mattermost REST APi
 type MattermostClient struct {
 	client *model.Client4
 }
 
+// Login setup MattermostClient
 func Login(url, token string) *MattermostClient {
 	c := model.NewAPIv4Client(url)
 	c.AuthToken = token
@@ -21,9 +23,10 @@ func Login(url, token string) *MattermostClient {
 	}
 }
 
-func (c *MattermostClient) RegistNewEmoji(b []byte, name, userId string) error {
+// RegistNewEmoji send a request for creating emoji
+func (c *MattermostClient) RegistNewEmoji(b []byte, name, userID string) error {
 	_, resp := c.client.CreateEmoji(&model.Emoji{
-		CreatorId: userId,
+		CreatorId: userID,
 		Name:      name,
 	}, b, "emojigen")
 

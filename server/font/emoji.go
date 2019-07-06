@@ -7,6 +7,7 @@ import (
 	"strings"
 )
 
+// EmojiInfo is the struct that store emoji info by users
 type EmojiInfo struct {
 	Name            string
 	Text            string
@@ -14,16 +15,23 @@ type EmojiInfo struct {
 	BackgroundColor Color
 }
 
+// Color is type of colors
 type Color int
 
 const (
+	// Black represents black color
 	Black Color = iota
+	// Red represents red color
 	Red
+	// Green represents green color
 	Green
+	// Blue represents blue color
 	Blue
+	// White represents white color
 	White
 )
 
+// ColorFromString convert string to Color type
 func ColorFromString(c string) (Color, error) {
 	switch strings.ToLower(c) {
 	case "black":
@@ -40,6 +48,7 @@ func ColorFromString(c string) (Color, error) {
 	return Black, fmt.Errorf("Invalid color name: [%s]", c)
 }
 
+// RGBA convert Color type to image.Uniform type
 func (c Color) RGBA() *image.Uniform {
 	switch c {
 	case Black:
@@ -56,6 +65,7 @@ func (c Color) RGBA() *image.Uniform {
 	return image.Black
 }
 
+// NewEmojiInfoFromLine parse text into EmojiInfo
 func NewEmojiInfoFromLine(text string) (*EmojiInfo, error) {
 	args := strings.Split(text, " ")
 	if len(args) < 3 || 5 < len(args) {

@@ -14,13 +14,13 @@ func generate(msg string) ([]byte, error) {
 	r := []rune(msg)
 	switch len(r) {
 	case 0:
-		return nil, fmt.Errorf("Emoji text must container between 1 and 4 characters.")
+		return nil, fmt.Errorf("emoji text must container between 1 and 4 characters")
 	case 1, 2:
 		return genOneLineImage(r)
 	case 3, 4:
 		return genMultiLineImage(r)
 	default:
-		return nil, fmt.Errorf("Emoji text must be less than or equal to 4 characters.")
+		return nil, fmt.Errorf("emoji text must be less than or equal to 4 characters")
 	}
 }
 

@@ -13,6 +13,7 @@ import (
 
 var infoMessage = "This is Mattermost Emojigen v" + manifest.Version + "\n"
 
+// InitAPI returns a router for mattermost-emojigen plugin
 func (p *EmojigenPlugin) InitAPI() *mux.Router {
 	r := mux.NewRouter()
 	r.HandleFunc("/", p.handleInfo).Methods("GET")
@@ -46,10 +47,10 @@ func (p *EmojigenPlugin) handleSubmitDialog(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	userId := request.UserId
+	userID := request.UserId
 
 	p.API.LogDebug(fmt.Sprintf("emoji: %#v", emojiInfo))
-	p.API.LogDebug(fmt.Sprintf("user_id: %v", userId))
+	p.API.LogDebug(fmt.Sprintf("user_id: %v", userID))
 
 	b, err := p.drawer.GenerateEmoji(emojiInfo)
 	if err != nil {
@@ -58,16 +59,16 @@ func (p *EmojigenPlugin) handleSubmitDialog(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	if err := p.client.RegistNewEmoji(b, emojiInfo.Name, userId); err != nil {
+	if err := p.client.RegistNewEmoji(b, emojiInfo.Name, userID); err != nil {
 		if err != nil {
 			p.API.LogWarn("Failed to create Emoji.", "details", err.Error())
 			http.Error(w, "internal server error", http.StatusInternalServerError)
 			return
 		}
 	}
-	p.API.SendEphemeralPost(userId, &model.Post{
+	p.API.SendEphemeralPost(userID, &model.Post{
 		ChannelId: request.ChannelId,
-		UserId:    userId,
+		UserId:    userID,
 		Message:   fmt.Sprintf("Creating emoji with `:%s:` is success. :%s:", emojiInfo.Name, emojiInfo.Name),
 	})
 	w.WriteHeader(http.StatusOK)
