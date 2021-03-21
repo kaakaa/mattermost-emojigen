@@ -8,13 +8,13 @@ Mattermost plugin for generating custom emoji.
 
 ## Set up
 
+Mattermost EmojiGen plugin needs [personal access token](https://docs.mattermost.com/developer/personal-access-tokens.html) to create emojis via Mattermost REST API. We recommend creating bot account, and using access token of the bot.
+
 ### 1. Create bot account
 
-Mattermost EmojiGen plugin needs [personal access token](https://docs.mattermost.com/developer/personal-access-tokens.html) to create emojis via Mattermost REST API. We recommends creating bot account, and using access token of bot.
-
-1. Create bot account from **Main Menu > Integrations > Bot Accounts**.
+1. Create bot account from **Main Menu > Integrations > Bot Accounts**
    - https://docs.mattermost.com/developer/bot-accounts.html#bot-account-creation
-2. Copy the Access Token that is displayed when the bot account creation is completed.
+2. Copy the Access Token that is displayed when the bot account creation is completed
    - Copied token will be used in step `2-3`
 
 ![](./screenshots/bot_access_token.png)
@@ -22,14 +22,14 @@ Mattermost EmojiGen plugin needs [personal access token](https://docs.mattermost
 ### 2. Install plugin
 
 1. Download a plugin distribution from [Releases · kaakaa/mattermost\-emojigen](https://github.com/kaakaa/mattermost-emojigen/releases/lateset)
-2. Upload and Enabling plugin **System Console > Plugin > **
+2. Upload and enable plugin **System Console > Plugin > Plugin Management**
 3. Set access token (copied in `1-2`) in plugin settings page
 
 ![](./screenshots/bot_settings.png)
 
 ## Usage
 
-Multi line emoji (such as ![sample](./screenshots/emoji_sample.png)) can be created by only EmojiDialog.
+You can generate emojis by slash command (`/emojigen`) or interactive dialog. Multi line emoji can be created by only emoji dialog.
 
 ### Simple Emoji
 
