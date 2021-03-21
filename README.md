@@ -29,6 +29,8 @@ Mattermost EmojiGen plugin needs [personal access token](https://docs.mattermost
 
 ## Usage
 
+![](./screenshots/emojigen.gif)
+
 You can generate emojis by slash command (`/emojigen`) or interactive dialog. Multi line emoji can be created by only emoji dialog.
 
 ### Simple Emoji
