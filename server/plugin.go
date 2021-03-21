@@ -15,6 +15,7 @@ import (
 type EmojigenPlugin struct {
 	plugin.MattermostPlugin
 	client *MattermostClient
+	userID string
 
 	configurationLock sync.RWMutex
 	configuration     *configuration
@@ -72,7 +73,7 @@ func (p *EmojigenPlugin) ExecuteCommand(c *plugin.Context, args *model.CommandAr
 		}, nil
 	}
 
-	userID := args.UserId
+	userID := p.userID
 
 	p.API.LogDebug(fmt.Sprintf("emoji: %#v", emoji))
 	p.API.LogDebug(fmt.Sprintf("user_id: %v", userID))
@@ -117,9 +118,18 @@ func (p *EmojigenPlugin) setMattermostClient() error {
 	}
 	config := p.API.GetConfig()
 	p.siteURL = *config.ServiceSettings.SiteURL
-	p.client = Login(p.siteURL, p.configuration.AccessToken)
-	p.API.LogInfo(fmt.Sprintf("SiteURL: %v", *config.ServiceSettings.SiteURL))
-	p.API.LogInfo(fmt.Sprintf("AccessToken: %v", p.configuration.AccessToken))
+
+	c, err := Login(p.siteURL, p.configuration.AccessToken)
+	if err != nil {
+		return nil
+	}
+	id, err := c.getUserId()
+	if err != nil {
+		return err
+	}
+
+	p.client = c
+	p.userID = id
 
 	return nil
 }
