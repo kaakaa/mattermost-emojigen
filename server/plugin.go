@@ -69,9 +69,9 @@ func (p *EmojigenPlugin) ExecuteCommand(c *plugin.Context, args *model.CommandAr
 	emoji, err := font.NewEmojiInfoFromLine(args.Command)
 	if err != nil {
 		appErr := &model.AppError{
-			Message: fmt.Sprintf("Encountered error when parsing command: %v", err.Error()),
+			Message:    fmt.Sprintf("Encountered error when parsing command: %v", err.Error()),
 			StatusCode: http.StatusBadRequest,
-			Where: "ExecuteCommand",
+			Where:      "ExecuteCommand",
 		}
 		p.SendEphemeralPost(args.ChannelId, args.UserId, args.RootId, appErr.Error())
 		return &model.CommandResponse{}, appErr
@@ -82,7 +82,7 @@ func (p *EmojigenPlugin) ExecuteCommand(c *plugin.Context, args *model.CommandAr
 		p.SendEphemeralPost(args.ChannelId, args.UserId, args.RootId, appErr.Error())
 		return &model.CommandResponse{}, appErr
 	}
-	p.SendEphemeralPost(args.ChannelId, args.UserId, args.RootId,fmt.Sprintf("Creating emoji with `:%s:` is success. :%s:", emoji.Name, emoji.Name))
+	p.SendEphemeralPost(args.ChannelId, args.UserId, args.RootId, fmt.Sprintf("Creating emoji with `:%s:` is success. :%s:", emoji.Name, emoji.Name))
 	return &model.CommandResponse{}, nil
 }
 
@@ -102,17 +102,17 @@ func (p *EmojigenPlugin) RegisterEmoji(emoji *font.EmojiInfo) *model.AppError {
 	p.API.LogDebug(fmt.Sprintf("emoji: %#v", emoji))
 	b, err := p.drawer.GenerateEmoji(emoji)
 	if err != nil {
-		return &model.AppError {
-			Message: fmt.Sprintf("failed to generate emoji. details: %s", err.Error()),
+		return &model.AppError{
+			Message:    fmt.Sprintf("failed to generate emoji. details: %s", err.Error()),
 			StatusCode: http.StatusBadRequest,
-			Where: "RegisterEmoji",
+			Where:      "RegisterEmoji",
 		}
 	}
 	if err := p.client.RegistNewEmoji(b, emoji.Name, p.UserID); err != nil {
-		return &model.AppError {
-			Message: fmt.Sprintf("failed to register emoji. details: %s", err.Error()),
+		return &model.AppError{
+			Message:    fmt.Sprintf("failed to register emoji. details: %s", err.Error()),
 			StatusCode: http.StatusBadRequest,
-			Where: "RegisterEmoji",
+			Where:      "RegisterEmoji",
 		}
 	}
 	return nil

@@ -42,7 +42,6 @@ func NewEmojiDrawer(bundlePath string) (*EmojiDrawer, error) {
 	}, nil
 }
 
-
 // GenerateEmoji generate the image of emoji and returns it as []byte format
 func (e *EmojiDrawer) GenerateEmoji(emoji *EmojiInfo) ([]byte, error) {
 	lines := strings.Split(emoji.Text, "\n")
@@ -67,15 +66,15 @@ func (e *EmojiDrawer) GenerateEmoji(emoji *EmojiInfo) ([]byte, error) {
 	drawer.Src = emoji.FontColor.RGBA()
 
 	unitSize := (&drawer).MeasureString(width.Widen.String("0"))
-	yOrigin := fixed.Int26_6((fixed.I(imageSize) - unitSize * fixed.Int26_6(len(runes))) / 2) - fixed.Int26_6(unitSize / 8)
+	yOrigin := fixed.Int26_6((fixed.I(imageSize)-unitSize*fixed.Int26_6(len(runes)))/2) - fixed.Int26_6(unitSize/8)
 	for i, r := range runes {
 		t := width.Widen.String(string(r))
 		if utf8.RuneCountInString(t) < maxLineLen {
-			t = t + width.Widen.String(strings.Repeat(" ", maxLineLen - utf8.RuneCountInString(t)))
+			t = t + width.Widen.String(strings.Repeat(" ", maxLineLen-utf8.RuneCountInString(t)))
 		}
 
 		drawer.Dot.X = (fixed.I(imageSize) - (&drawer).MeasureString(t)) / 2
-		drawer.Dot.Y = yOrigin + (fixed.Int26_6(i+1)*unitSize)
+		drawer.Dot.Y = yOrigin + (fixed.Int26_6(i+1) * unitSize)
 		drawer.DrawString(t)
 	}
 
