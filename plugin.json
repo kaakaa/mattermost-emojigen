@@ -1,9 +1,9 @@
 {
-    "id": "emojigen",
-    "name": "EmojiGen",
-    "description": "Generate emoji.",
-    "version": "0.2.0",
-    "min_server_version": "5.10.0",
+    "id": "com.github.kaakaa.mattermost-emojigen",
+    "name": "Mattermost EmojiGen",
+    "description": "Generate emoji from text.",
+    "version": "0.3.0",
+    "min_server_version": "5.30.0",
     "server": {
         "executables": {
             "linux-amd64": "server/dist/plugin-linux-amd64",
