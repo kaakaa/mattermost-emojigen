@@ -44,31 +44,28 @@ func (p *EmojigenPlugin) handleSubmitDialog(w http.ResponseWriter, r *http.Reque
 	if err != nil {
 		p.API.LogWarn("Failed to parse SubmitDialogRequest", "details", err.Error())
 		http.Error(w, "invalid request", http.StatusBadRequest)
+		p.API.SendEphemeralPost(request.UserId, &model.Post{
+			ChannelId: request.ChannelId,
+			UserId:    p.UserID,
+			Message:   fmt.Sprintf("failed to create emoji. details: %s", err.Error()),
+		})
 		return
 	}
-
-	userID := request.UserId
-
-	p.API.LogDebug(fmt.Sprintf("emoji: %#v", emojiInfo))
-	p.API.LogDebug(fmt.Sprintf("user_id: %v", userID))
-
-	b, err := p.drawer.GenerateEmoji(emojiInfo)
+	err = p.RegisterEmoji(emojiInfo)
 	if err != nil {
-		p.API.LogWarn("Failed to generate Emoji.", "details", err.Error())
+		p.API.LogWarn("Failed to create emoji.", "details", err.Error())
 		http.Error(w, "internal server error", http.StatusInternalServerError)
+		p.API.SendEphemeralPost(request.UserId, &model.Post{
+			ChannelId: request.ChannelId,
+			UserId:    p.UserID,
+			Message:   fmt.Sprintf("failed to create emoji. details: %s", err.Error()),
+		})
 		return
 	}
 
-	if err := p.client.RegistNewEmoji(b, emojiInfo.Name, userID); err != nil {
-		if err != nil {
-			p.API.LogWarn("Failed to create Emoji.", "details", err.Error())
-			http.Error(w, "internal server error", http.StatusInternalServerError)
-			return
-		}
-	}
-	p.API.SendEphemeralPost(userID, &model.Post{
+	p.API.SendEphemeralPost(request.UserId, &model.Post{
 		ChannelId: request.ChannelId,
-		UserId:    userID,
+		UserId:    p.UserID,
 		Message:   fmt.Sprintf("Creating emoji with `:%s:` is success. :%s:", emojiInfo.Name, emojiInfo.Name),
 	})
 	w.WriteHeader(http.StatusOK)

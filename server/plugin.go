@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 	"strings"
 	"sync"
 
@@ -15,7 +16,7 @@ import (
 type EmojigenPlugin struct {
 	plugin.MattermostPlugin
 	client *MattermostClient
-	userID string
+	UserID string
 
 	configurationLock sync.RWMutex
 	configuration     *configuration
@@ -67,37 +68,22 @@ func (p *EmojigenPlugin) ExecuteCommand(c *plugin.Context, args *model.CommandAr
 
 	emoji, err := font.NewEmojiInfoFromLine(args.Command)
 	if err != nil {
-		return &model.CommandResponse{
-			ResponseType: model.COMMAND_RESPONSE_TYPE_EPHEMERAL,
-			Text:         fmt.Sprintf("Encountered error when parsing command: %v", err.Error()),
-		}, nil
+		appErr := &model.AppError{
+			Message: fmt.Sprintf("Encountered error when parsing command: %v", err.Error()),
+			StatusCode: http.StatusBadRequest,
+			Where: "ExecuteCommand",
+		}
+		p.SendEphemeralPost(args.ChannelId, args.UserId, args.RootId, appErr.Error())
+		return &model.CommandResponse{}, appErr
 	}
 
-	userID := p.userID
-
-	p.API.LogDebug(fmt.Sprintf("emoji: %#v", emoji))
-	p.API.LogDebug(fmt.Sprintf("user_id: %v", userID))
-
-	b, err := p.drawer.GenerateEmoji(emoji)
-
-	if err != nil {
-		return &model.CommandResponse{
-			ResponseType: model.COMMAND_RESPONSE_TYPE_EPHEMERAL,
-			Text:         fmt.Sprintf("Encountered error when generating emoji image: %v", err.Error()),
-		}, nil
+	appErr := p.RegisterEmoji(emoji)
+	if appErr != nil {
+		p.SendEphemeralPost(args.ChannelId, args.UserId, args.RootId, appErr.Error())
+		return &model.CommandResponse{}, appErr
 	}
-
-	if err := p.client.RegistNewEmoji(b, emoji.Name, userID); err != nil {
-		p.API.LogError(err.Error())
-		return &model.CommandResponse{
-			ResponseType: model.COMMAND_RESPONSE_TYPE_EPHEMERAL,
-			Text:         fmt.Sprintf("Encountered error when creating emoji: %v", err.Error()),
-		}, nil
-	}
-	return &model.CommandResponse{
-		ResponseType: model.COMMAND_RESPONSE_TYPE_EPHEMERAL,
-		Text:         fmt.Sprintf("Creating emoji with `:%s:` is success. :%s:", emoji.Name, emoji.Name),
-	}, nil
+	p.SendEphemeralPost(args.ChannelId, args.UserId, args.RootId,fmt.Sprintf("Creating emoji with `:%s:` is success. :%s:", emoji.Name, emoji.Name))
+	return &model.CommandResponse{}, nil
 }
 
 // OnConfigurationChange handle changes of configuration
@@ -110,6 +96,26 @@ func (p *EmojigenPlugin) OnConfigurationChange() error {
 
 	p.setConfiguration(configuration)
 	return p.setMattermostClient()
+}
+
+func (p *EmojigenPlugin) RegisterEmoji(emoji *font.EmojiInfo) *model.AppError {
+	p.API.LogDebug(fmt.Sprintf("emoji: %#v", emoji))
+	b, err := p.drawer.GenerateEmoji(emoji)
+	if err != nil {
+		return &model.AppError {
+			Message: fmt.Sprintf("failed to generate emoji. details: %s", err.Error()),
+			StatusCode: http.StatusBadRequest,
+			Where: "RegisterEmoji",
+		}
+	}
+	if err := p.client.RegistNewEmoji(b, emoji.Name, p.UserID); err != nil {
+		return &model.AppError {
+			Message: fmt.Sprintf("failed to register emoji. details: %s", err.Error()),
+			StatusCode: http.StatusBadRequest,
+			Where: "RegisterEmoji",
+		}
+	}
+	return nil
 }
 
 func (p *EmojigenPlugin) setMattermostClient() error {
@@ -129,7 +135,7 @@ func (p *EmojigenPlugin) setMattermostClient() error {
 	}
 
 	p.client = c
-	p.userID = id
+	p.UserID = id
 
 	return nil
 }
@@ -185,4 +191,15 @@ func (p *EmojigenPlugin) getEmojiDialog(triggerID string) model.OpenDialogReques
 			SubmitLabel: "Create",
 		},
 	}
+}
+
+// SendEphemeralPost sends an ephemeral post to a user as the bot account
+func (p *EmojigenPlugin) SendEphemeralPost(channelID, userID, rootID, message string) {
+	ephemeralPost := &model.Post{
+		ChannelId: channelID,
+		UserId:    p.UserID,
+		RootId:    rootID,
+		Message:   message,
+	}
+	_ = p.API.SendEphemeralPost(userID, ephemeralPost)
 }
