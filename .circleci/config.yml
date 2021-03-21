@@ -10,3 +10,20 @@ workflows:
       - plugin-ci/lint
       - plugin-ci/test
       - plugin-ci/build
+      - plugin-ci/build:
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
+          requires:
+            - plugin-ci/lint
+            - plugin-ci/coverage
+      - plugin-ci/deploy-release-github:
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
+          requires:
+            - plugin-ci/build
