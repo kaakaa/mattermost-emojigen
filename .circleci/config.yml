@@ -25,15 +25,6 @@ workflows:
           requires:
             - plugin-ci/lint
             - plugin-ci/coverage
-      - plugin-ci/build:
-          filters:
-            tags:
-              only: /^v.*/
-            branches:
-              ignore: /.*/
-          requires:
-            - plugin-ci/lint
-            - plugin-ci/coverage
       - plugin-ci/deploy-release-github:
           filters:
             tags:
