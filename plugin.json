@@ -2,6 +2,9 @@
     "id": "com.github.kaakaa.mattermost-emojigen",
     "name": "Mattermost EmojiGen",
     "description": "Generate emoji from text.",
+    "homepage_url": "https://github.com/kaakaa/mattermost-emojigen",
+    "support_url": "https://github.com/kaakaa/mattermost-emojigen/issues",
+    "release_notes_url": "https://github.com/kaakaa/mattermost-emojigen/releases/tag/v0.3.0",
     "version": "0.3.0",
     "min_server_version": "5.30.0",
     "server": {
