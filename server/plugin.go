@@ -159,7 +159,9 @@ func (p *EmojigenPlugin) getEmojiDialog(triggerID string) model.OpenDialogReques
 					Name:        "emoji_text",
 					Type:        "textarea",
 					MinLength:   1,
-					MaxLength:   4,
+					MaxLength:   20,
+					HelpText:    "Text to be rendered as emoji. Text must be 1 ~ 20 characters including new line char.",
+					Placeholder: "やば\nすぎ",
 				},
 				{
 					DisplayName: "Font Color",

@@ -51,14 +51,14 @@ func (p *EmojigenPlugin) handleSubmitDialog(w http.ResponseWriter, r *http.Reque
 		})
 		return
 	}
-	err = p.RegisterEmoji(emojiInfo)
-	if err != nil {
-		p.API.LogWarn("Failed to create emoji.", "details", err.Error())
+	appErr := p.RegisterEmoji(emojiInfo)
+	if appErr != nil {
+		p.API.LogWarn("Failed to create emoji.", "details", appErr.Error())
 		http.Error(w, "internal server error", http.StatusInternalServerError)
 		p.API.SendEphemeralPost(request.UserId, &model.Post{
 			ChannelId: request.ChannelId,
 			UserId:    p.UserID,
-			Message:   fmt.Sprintf("failed to create emoji. details: %s", err.Error()),
+			Message:   fmt.Sprintf("failed to create emoji. details: %s", appErr.Error()),
 		})
 		return
 	}
