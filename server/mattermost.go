@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io"
 	"net/http"
 
 	"github.com/mattermost/mattermost-server/v5/model"
@@ -45,10 +44,4 @@ func (c *MattermostClient) RegistNewEmoji(b []byte, name, userID string) error {
 		return fmt.Errorf(resp.Error.Message)
 	}
 	return nil
-}
-
-func writeResponse(w http.ResponseWriter, response model.CommandResponse) {
-	if _, err := io.WriteString(w, response.ToJson()); err != nil {
-		return
-	}
 }

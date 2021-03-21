@@ -45,7 +45,7 @@ func ColorFromString(c string) (Color, error) {
 	case "white":
 		return White, nil
 	}
-	return Black, fmt.Errorf("Invalid color name: [%s]", c)
+	return Black, fmt.Errorf("invalid color name: [%s]", c)
 }
 
 // RGBA convert Color type to image.Uniform type
@@ -69,19 +69,20 @@ func (c Color) RGBA() *image.Uniform {
 func NewEmojiInfoFromLine(text string) (*EmojiInfo, error) {
 	args := strings.Split(text, " ")
 	if len(args) < 3 || 5 < len(args) {
-		return nil, fmt.Errorf("Invalid command")
+		return nil, fmt.Errorf("invalid command")
 	}
 	emoji := &EmojiInfo{}
 	emoji.Name = args[1]
 	emoji.Text = args[2]
-	if len(args) == 4 {
+	switch len(args) {
+	case 4:
 		c, err := ColorFromString(args[3])
 		if err != nil {
 			return nil, err
 		}
 		emoji.FontColor = c
 		emoji.BackgroundColor = White
-	} else if len(args) == 5 {
+	case 5:
 		c, err := ColorFromString(args[3])
 		if err != nil {
 			return nil, err
@@ -92,7 +93,7 @@ func NewEmojiInfoFromLine(text string) (*EmojiInfo, error) {
 			return nil, err
 		}
 		emoji.BackgroundColor = c
-	} else {
+	default:
 		emoji.FontColor = Black
 		emoji.BackgroundColor = White
 	}

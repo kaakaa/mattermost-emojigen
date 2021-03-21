@@ -29,7 +29,7 @@ func (p *EmojigenPlugin) ServeHTTP(c *plugin.Context, w http.ResponseWriter, r *
 }
 
 func (p *EmojigenPlugin) handleInfo(w http.ResponseWriter, _ *http.Request) {
-	io.WriteString(w, infoMessage)
+	_, _ = io.WriteString(w, infoMessage)
 }
 
 func (p *EmojigenPlugin) handleSubmitDialog(w http.ResponseWriter, r *http.Request) {
@@ -66,7 +66,7 @@ func (p *EmojigenPlugin) handleSubmitDialog(w http.ResponseWriter, r *http.Reque
 	p.API.SendEphemeralPost(request.UserId, &model.Post{
 		ChannelId: request.ChannelId,
 		UserId:    p.UserID,
-		Message:   fmt.Sprintf("Creating emoji with `:%s:` is success. :%s:", emojiInfo.Name, emojiInfo.Name),
+		Message:   fmt.Sprintf("creating emoji with `:%s:` is success. :%s:", emojiInfo.Name, emojiInfo.Name),
 	})
 	w.WriteHeader(http.StatusOK)
 }
@@ -74,15 +74,15 @@ func (p *EmojigenPlugin) handleSubmitDialog(w http.ResponseWriter, r *http.Reque
 func requestToEmojiInfo(request *model.SubmitDialogRequest) (*font.EmojiInfo, error) {
 	name, ok := request.Submission["emoji_name"].(string)
 	if !ok {
-		return nil, fmt.Errorf("Failed to get `emoji_name` from submission. %#v", request.Submission)
+		return nil, fmt.Errorf("failed to get `emoji_name` from submission. %#v", request.Submission)
 	}
 	text, ok := request.Submission["emoji_text"].(string)
 	if !ok {
-		return nil, fmt.Errorf("Failed to get `emoji_text` from submission. %#v", request.Submission)
+		return nil, fmt.Errorf("failed to get `emoji_text` from submission. %#v", request.Submission)
 	}
 	fc, ok := request.Submission["emoji_font_color"].(string)
 	if !ok {
-		return nil, fmt.Errorf("Failed to get `emoji_font_color` from submission. %#v", request.Submission)
+		return nil, fmt.Errorf("failed to get `emoji_font_color` from submission. %#v", request.Submission)
 	}
 	fontColor, err := font.ColorFromString(fc)
 	if err != nil {
@@ -91,7 +91,7 @@ func requestToEmojiInfo(request *model.SubmitDialogRequest) (*font.EmojiInfo, er
 
 	bgc, ok := request.Submission["emoji_background_color"].(string)
 	if !ok {
-		return nil, fmt.Errorf("Failed to get `emoji_background_color` from submission. %#v", request.Submission)
+		return nil, fmt.Errorf("failed to get `emoji_background_color` from submission. %#v", request.Submission)
 	}
 	bgColor, err := font.ColorFromString(bgc)
 	if err != nil {
