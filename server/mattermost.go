@@ -23,7 +23,7 @@ func Login(url, token string) (*MattermostClient, error) {
 	}, nil
 }
 
-func (c *MattermostClient) getUserId() (string, error) {
+func (c *MattermostClient) getUserID() (string, error) {
 	u, resp := c.client.GetMe("")
 	if resp.Error != nil {
 		return "", fmt.Errorf("failed to get user id: %w", resp.Error)

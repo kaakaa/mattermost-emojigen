@@ -98,6 +98,7 @@ func (p *EmojigenPlugin) OnConfigurationChange() error {
 	return p.setMattermostClient()
 }
 
+// RegisterEmoji register emoji to mattermost
 func (p *EmojigenPlugin) RegisterEmoji(emoji *font.EmojiInfo) *model.AppError {
 	p.API.LogDebug(fmt.Sprintf("emoji: %#v", emoji))
 	b, err := p.drawer.GenerateEmoji(emoji)
@@ -129,7 +130,7 @@ func (p *EmojigenPlugin) setMattermostClient() error {
 	if err != nil {
 		return nil
 	}
-	id, err := c.getUserId()
+	id, err := c.getUserID()
 	if err != nil {
 		return err
 	}
