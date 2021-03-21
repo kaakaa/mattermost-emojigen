@@ -1,3 +1,4 @@
 config.json
 dist/
 vendor/
+.DS_Store
