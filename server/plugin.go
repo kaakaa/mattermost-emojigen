@@ -109,7 +109,7 @@ func (p *EmojigenPlugin) RegisterEmoji(emoji *font.EmojiInfo) *model.AppError {
 			Where:      "RegisterEmoji",
 		}
 	}
-	if err := p.client.RegistNewEmoji(b, emoji.Name, p.UserID); err != nil {
+	if err := p.client.RegisterNewEmoji(b, emoji.Name, p.UserID); err != nil {
 		return &model.AppError{
 			Message:    fmt.Sprintf("failed to register emoji. details: %s", err.Error()),
 			StatusCode: http.StatusBadRequest,
@@ -205,4 +205,10 @@ func (p *EmojigenPlugin) SendEphemeralPost(channelID, userID, rootID, message st
 		Message:   message,
 	}
 	_ = p.API.SendEphemeralPost(userID, ephemeralPost)
+}
+
+// SetAPI persists the given API interface to the plugin. It is invoked just prior to the
+// OnActivate hook, exposing the API for use by the plugin.
+func (p *EmojigenPlugin) SetAPI(api plugin.API) {
+	p.API = api
 }

@@ -42,18 +42,18 @@ func (p *EmojigenPlugin) handleSubmitDialog(w http.ResponseWriter, r *http.Reque
 	if err != nil {
 		p.API.LogWarn("Failed to parse SubmitDialogRequest", "details", err.Error())
 		http.Error(w, "invalid request", http.StatusBadRequest)
-		p.SendEphemeralPost(request.UserId, request.ChannelId, "", fmt.Sprintf("failed to create emoji. details: %s", err.Error()))
+		p.SendEphemeralPost(request.ChannelId, request.UserId, "", fmt.Sprintf("failed to create emoji. details: %s", err.Error()))
 		return
 	}
 	appErr := p.RegisterEmoji(emojiInfo)
 	if appErr != nil {
 		p.API.LogWarn("Failed to create emoji.", "details", appErr.Error())
 		http.Error(w, "internal server error", http.StatusInternalServerError)
-		p.SendEphemeralPost(request.UserId, request.ChannelId, "", fmt.Sprintf("failed to create emoji. details: %s", appErr.Error()))
+		p.SendEphemeralPost(request.ChannelId, request.UserId, "", fmt.Sprintf("failed to create emoji. details: %s", appErr.Error()))
 		return
 	}
 
-	p.SendEphemeralPost(request.UserId, request.ChannelId, "", fmt.Sprintf("creating emoji with `:%s:` is success. :%s:", emojiInfo.Name, emojiInfo.Name))
+	p.SendEphemeralPost(request.ChannelId, request.UserId, "", fmt.Sprintf("creating emoji with `:%s:` is success. :%s:", emojiInfo.Name, emojiInfo.Name))
 	w.WriteHeader(http.StatusOK)
 }
 

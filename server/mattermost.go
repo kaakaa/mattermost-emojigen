@@ -33,8 +33,8 @@ func (c *MattermostClient) getUserID() (string, error) {
 	return u.Id, nil
 }
 
-// RegistNewEmoji send a request for creating emoji
-func (c *MattermostClient) RegistNewEmoji(b []byte, name, userID string) error {
+// RegisterNewEmoji send a request for creating emoji
+func (c *MattermostClient) RegisterNewEmoji(b []byte, name, userID string) error {
 	_, resp := c.client.CreateEmoji(&model.Emoji{
 		CreatorId: userID,
 		Name:      name,
