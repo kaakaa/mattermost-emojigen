@@ -11,8 +11,6 @@ import (
 	"github.com/mattermost/mattermost-server/v5/plugin"
 )
 
-var infoMessage = "This is Mattermost Emojigen v" + manifest.Version + "\n"
-
 // InitAPI returns a router for mattermost-emojigen plugin
 func (p *EmojigenPlugin) InitAPI() *mux.Router {
 	r := mux.NewRouter()
@@ -29,7 +27,7 @@ func (p *EmojigenPlugin) ServeHTTP(c *plugin.Context, w http.ResponseWriter, r *
 }
 
 func (p *EmojigenPlugin) handleInfo(w http.ResponseWriter, _ *http.Request) {
-	_, _ = io.WriteString(w, infoMessage)
+	_, _ = io.WriteString(w, "This is Mattermost Emojigen v"+manifest.Version+"\n")
 }
 
 func (p *EmojigenPlugin) handleSubmitDialog(w http.ResponseWriter, r *http.Request) {
